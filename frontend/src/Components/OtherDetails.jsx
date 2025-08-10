@@ -33,6 +33,8 @@ const OtherDetails = () => {
     setDestination,
     termsOfDelivery,
     setTermsOfDelivery,
+    hsnSAC,
+    setHSNSAC
   } = useContext(BillContext);
 
   function getFinancialYear() {
@@ -232,6 +234,16 @@ const OtherDetails = () => {
           name="termsOfDelivery"
           value={termsOfDelivery}
           onChange={(e) => setTermsOfDelivery(e.target.value)}
+          className="border rounded p-1.5"
+        />
+        <label className="text-sm font-medium text-gray-900">
+          HSN/SAC:
+        </label>
+        <input
+          type="number"
+          name="hsnSAC"
+          value={hsnSAC}
+          onChange={(e) => setHSNSAC(e.target.value)}
           className="border rounded p-1.5"
         />
       </div>

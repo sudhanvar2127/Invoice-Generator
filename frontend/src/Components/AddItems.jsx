@@ -12,7 +12,6 @@ const AddItems = () => {
     descriptionOfGoods,
     setDescriptionOfGoods,
     hsnSAC,
-    setHSNSAC,
     quantity,
     setQuantity,
     rate,
@@ -47,7 +46,6 @@ const AddItems = () => {
     const amt = qty * rt;
     const newItem = {
       descriptionOfGoods,
-      hsnSAC,
       quantity: qty,
       rate: rt,
       amount: amt,
@@ -56,7 +54,6 @@ const AddItems = () => {
     setAddItems([...addItems, newItem]);
 
     setDescriptionOfGoods("");
-    setHSNSAC("");
     setQuantity("");
     setRate("");
     setAmount("");
@@ -143,16 +140,6 @@ const AddItems = () => {
             className="border rounded p-2"
           />
         </section>
-        <section className="flex flex-col text-sm font-medium gap-2">
-          <label>HSN/SAC:</label>
-          <input
-            name="hsnSAC"
-            type="number"
-            value={hsnSAC}
-            onChange={(e) => setHSNSAC(e.target.value)}
-            className="border rounded p-2"
-          />
-        </section>
         <section className="flex flex-col text-sm font-medium gap-2 w-[15%]">
           <label>&nbsp;</label>
           <button
@@ -181,7 +168,7 @@ const AddItems = () => {
               <tr key={index} className="text-center">
                 <td className="border p-2">{index + 1}</td>
                 <td className="border p-2">{item.descriptionOfGoods}</td>
-                <td className="border p-2">{item.hsnSAC}</td>
+                <td className="border p-2">{hsnSAC}</td>
                 <td className="border p-2">{item.quantity}</td>
                 <td className="border p-2">{item.rate}</td>
                 <td className="border p-2">{item.amount}</td>
