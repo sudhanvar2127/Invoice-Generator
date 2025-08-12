@@ -4,12 +4,46 @@ a.active hr {
   display: block;
 }
 
-*{
-    /* font-family: Outfit; */
-}
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
 
-.prata-regular{
-    font-family: "Prata", serif;
-    font-weight: 400;
-    font-style: normal;
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .a4 {
+    width: 200mm;
+    min-height: 287mm;
+    padding: 5mm;
+    box-sizing: border-box;
+    background: white;
+    transform: scale(0.95);
+    transform-origin: top center;
+  }
+
+  table {
+    border-collapse: collapse !important;
+    width: 100%;
+    font-size: 10pt;
+  }
+
+  th, td {
+    padding: 3px;
+  }
+
+  .no-print, .navbar, header {
+    display: none !important;
+  }
 }

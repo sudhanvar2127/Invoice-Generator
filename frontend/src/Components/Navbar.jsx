@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <div className="flex items-center justify-around py-5 font-medium">
+    <div className="flex items-center justify-around py-5 font-medium navbar no-print">
       <Link to="/">
         <h1 className="w- cursor-pointer">Sri Kalpvrusha Printers</h1>
       </Link>

@@ -13,6 +13,9 @@ const BillContextProvide = (props) => {
       address:
         "# 495/15, Bharath Poultry Form, Nittuvalli Road, Near R.V.V.S. ITI College, Davangere - 577004",
       gstin: "29ABSPH4496G1Z0",
+      bankname: "Karanataka Gramina Bank",
+      accno: 123456789,
+      branchifs: "Hello, 123456789",
     },
     {
       id: "ShreeSharadaPrinters",
@@ -22,6 +25,9 @@ const BillContextProvide = (props) => {
       address:
         "#4382/1 Suvidya 7th B main Road Swami Vivekananda Badavane, Behind Officers club, Davangere - 577004",
       gstin: "29ABSPH4496G1Z0",
+      bankname: "Karanataka Gramina Bank",
+      accno: 123456789,
+      branchifs: "Hello, 123456789",
     }
   ];
 

@@ -40,7 +40,7 @@ const Preview = () => {
   } = useContext(BillContext);
 
   return (
-    <div>
+    <div className="a4">
       <div className="flex border border-b-0">
         <div className="flex flex-col w-3/5">
           <section className="border-b p-2">
@@ -119,7 +119,11 @@ const Preview = () => {
                 </td>
                 <td className="w-1/2 border-b p-2">
                   <p>Mode/Terms of Payment:</p>
-                  {modeAndTermsOfPayment !== "" ? modeAndTermsOfPayment : <p>&nbsp;</p>}
+                  {modeAndTermsOfPayment !== "" ? (
+                    modeAndTermsOfPayment
+                  ) : (
+                    <p>&nbsp;</p>
+                  )}
                 </td>
               </tr>
               <tr>
@@ -183,7 +187,7 @@ const Preview = () => {
           <thead>
             <tr className="text-sm font-medium border text-center">
               <td className="border p-2">Sl.No</td>
-              <td className="border p-2">Description of Goods</td>
+              <td className="border p-2 w-3/5">Description of Goods</td>
               <td className="border p-2">HSN/SAC</td>
               <td className="border p-2">Quantity</td>
               <td className="border p-2">Rate</td>
@@ -196,7 +200,7 @@ const Preview = () => {
               <tr key={index} className="text-center text-sm font-medium">
                 <td className="border-r p-2">{index + 1}</td>
                 <td className="border-r p-2">{item.descriptionOfGoods}</td>
-                <td className="border-r p-2">{item.hsnSAC}</td>
+                <td className="border-r p-2">{hsnSAC}</td>
                 <td className="border-r p-2">{item.quantity}</td>
                 <td className="border-r p-2">{item.rate}</td>
                 <td className="border-r p-2">{item.amount}</td>
@@ -324,13 +328,41 @@ const Preview = () => {
           </table>
         </div>
       )}
-      <div className="flex justify-between items-center w-full my-2">
+
+      <div className="w-full flex flex-col p-2 border border-t-0">
+        <div className="w-1/2 flex flex-col justify-end">
+          {sellers.map(
+            (item, index) =>
+              seller === index && (
+                <>
+                  <p>Company's Bank Details</p>
+                  <p>
+                    Bank Name: <strong>{item.bankname}</strong>
+                  </p>
+                  <p>
+                    A/c No.: <strong>{item.accno}</strong>
+                  </p>
+                  <p>
+                    Branch & IFS Code: <strong>{item.branchifs}</strong>
+                  </p>
+                </>
+              )
+          )}
+        </div>
+        <div className=""></div>
+      </div>
+
+      <div className="flex justify-between items-center w-full my-2 no-print">
         <Link to="/" className="w-[15%]">
           <button className="bg-gray-700 p-2 text-white font-medium text-sm rounded w-full hover:bg-gray-950 cursor-pointer">
             Back
           </button>
         </Link>
-        <button className="bg-gray-700 p-2 text-white font-medium text-sm rounded w-[20%] hover:bg-gray-950 cursor-pointer">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="bg-gray-700 p-2 text-white font-medium text-sm rounded w-[20%] hover:bg-gray-950 cursor-pointer"
+        >
           Download Invoice
         </button>
       </div>
