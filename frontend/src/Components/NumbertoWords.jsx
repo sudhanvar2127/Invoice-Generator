@@ -71,5 +71,5 @@ function convertAmountToWords(amount) {
 
 export default function NumberToWords({ number }) {
   const words = convertAmountToWords(number);
-  return <div className='text-xl'>{words}</div>;
+  return <div className='text-base'>{words}</div>;
 }

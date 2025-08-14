@@ -28,27 +28,35 @@ const BillContextProvide = (props) => {
       bankname: "Karanataka Gramina Bank",
       accno: 123456789,
       branchifs: "Hello, 123456789",
-    }
+    },
   ];
 
   const [seller, setSeller] = useState(sellers[0]);
   const [gst, setGst] = useState(true);
-  const [buyer, setBuyer] = useState([{
-    name: "",
-    address: "",
-    phone: "",
-    gstin: "",
-    email: "",
-  }]);
-  const [consignee, setConsignee] = useState([{
-    name: "",
-    address: "",
-    phone: "",
-    gstin: "",
-    email: "",
-  }]);
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [buyer, setBuyer] = useState([
+    {
+      name: "",
+      address: "",
+      phone: "",
+      gstin: "",
+      email: "",
+    },
+  ]);
+  const [consignee, setConsignee] = useState([
+    {
+      name: "",
+      address: "",
+      phone: "",
+      gstin: "",
+      email: "",
+    },
+  ]);
+  const [date, setDate] = useState(
+    () => new Date().toISOString().split("T")[0]
+  );
+  const [invoiceNumber, setInvoiceNumber] = useState(() => {
+    return localStorage.getItem("currentInvoiceNumber");
+  });
   const [ewayNumber, setEwayNumber] = useState("");
   const [modeAndTermsOfPayment, setModeAndTremsOfPayment] = useState("");
   const [deliveryNote, setDeliveryNote] = useState("");
@@ -69,11 +77,33 @@ const BillContextProvide = (props) => {
   const [amount, setAmount] = useState();
   const [roundOff, setRoundOff] = useState(0);
   const [gstPercentage, setGstPrecentage] = useState();
-  const [subTotal,setSubTotal] = useState(0);
+  const [subTotal, setSubTotal] = useState(0);
   const [gstAmount, setGstAmount] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
   const [cGst, setCGST] = useState(0);
   const [sGst, setSGST] = useState(0);
+
+  function getFinancialYear() {
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    if (month >= 4) {
+      return `${year}-${(year + 1).toString().slice(-2)}`;
+    } else {
+      return `${year - 1}-${year.toString().slice(-2)}`;
+    }
+  }
+
+  function getNextInvoiceNumber() {
+    const fy = getFinancialYear();
+    const key = `inv-serial-${fy}`;
+    let serial = parseInt(localStorage.getItem(key) || "0", 10);
+    serial += 1;
+    localStorage.setItem(key, serial);
+    const nextNumber = `${fy}/${serial.toString().padStart(3, "0")}`;
+    localStorage.setItem("currentInvoiceNumber", nextNumber);
+    return nextNumber;
+  }
 
   const value = {
     sellers,
@@ -138,7 +168,8 @@ const BillContextProvide = (props) => {
     cGst,
     setCGST,
     sGst,
-    setSGST
+    setSGST,
+    getNextInvoiceNumber,
   };
 
   return (

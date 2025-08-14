@@ -2,6 +2,7 @@ import React, { useContext, forwardRef } from "react";
 import { BillContext } from "../Context/BillingContext";
 import { Link } from "react-router-dom";
 import NumbertoWords from "../Components/NumbertoWords";
+import { toast } from "react-toastify";
 
 const Preview = () => {
   const {
@@ -37,7 +38,192 @@ const Preview = () => {
     grandTotal,
     cGst,
     sGst,
+    getNextInvoiceNumber,
+    setInvoiceNumber,
   } = useContext(BillContext);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const dateObj = new Date(dateStr);
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // month is 0-indexed
+    const year = dateObj.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const downloadCSV = () => {
+    const rows = [];
+
+    // --- Seller Section ---
+    const currentSeller = sellers[seller];
+    if (currentSeller) {
+      rows.push(["Seller Details"]);
+      rows.push(["Name", currentSeller.name || ""]);
+      rows.push(["Address", currentSeller.address || ""]);
+      rows.push(["Phone", currentSeller.phone || ""]);
+      rows.push(["Email", currentSeller.email || ""]);
+      if (currentSeller.gstin) rows.push(["GSTIN", currentSeller.gstin]);
+      rows.push([]);
+    }
+
+    // --- Buyer Section ---
+    rows.push(["Buyer Details"]);
+    rows.push(["Name", buyer.name || ""]);
+    rows.push(["Address", buyer.address || ""]);
+    rows.push(["Phone", buyer.phone || ""]);
+    rows.push(["Email", buyer.email || ""]);
+    if (buyer.gstin) rows.push(["GSTIN", buyer.gstin]);
+    rows.push([]);
+
+    // --- Consignee Section ---
+    rows.push(["Consignee Details"]);
+    rows.push(["Name", consignee.name || ""]);
+    rows.push(["Address", consignee.address || ""]);
+    rows.push(["Phone", consignee.phone || ""]);
+    rows.push(["Email", consignee.email || ""]);
+    if (consignee.gstin) rows.push(["GSTIN", consignee.gstin]);
+    rows.push([]);
+
+    // --- Invoice Header Information ---
+    rows.push(["Invoice Details"]);
+    rows.push(["Invoice Number", invoiceNumber || ""]);
+    rows.push(["Date", formatDate(date) || ""]);
+    rows.push(["Delivery Note", deliveryNote || ""]);
+    rows.push(["Mode/Terms of Payment", modeAndTermsOfPayment || ""]);
+    rows.push(["Reference No. & Date", referenceNumber || ""]);
+    rows.push(["Other Reference", otherReference || ""]);
+    rows.push(["Buyer's Order Number", buyersOrderNumber || ""]);
+    rows.push(["Dated", dated || ""]);
+    rows.push(["Dispatch Doc No.", dispatchDocNumber || ""]);
+    rows.push(["Delivery Note Date", deliveryDateNote || ""]);
+    rows.push(["Dispatched Through", dispatchThrough || ""]);
+    rows.push(["Destination", destination || ""]);
+    rows.push(["Terms of Delivery", termsOfDelivery || ""]);
+    rows.push(["E-way Bill No.", ewayNumber || ""]);
+    rows.push(["HSN/SAC", hsnSAC || ""]);
+    rows.push([]); // blank row
+
+    // --- Items ---
+    rows.push([
+      "Sl.No",
+      "Description of Goods",
+      "HSN/SAC",
+      "Quantity",
+      "Rate",
+      "Amount",
+    ]);
+    addItems.forEach((item, index) => {
+      rows.push([
+        index + 1,
+        item.descriptionOfGoods || "",
+        hsnSAC || "",
+        item.quantity || "",
+        item.rate || "",
+        item.amount || "",
+      ]);
+    });
+    rows.push([]);
+
+    // --- Totals ---
+    rows.push(["Sub Total", "", "", "", "", subTotal.toFixed(2)]);
+
+    if (!isNaN(Number(gstPercentage)) && gst) {
+      rows.push([
+        `CGST (${(Number(gstPercentage) / 2).toFixed(2)}%)`,
+        "",
+        "",
+        "",
+        "",
+        (cGst ?? 0).toFixed(2),
+      ]);
+      rows.push([
+        `SGST (${(Number(gstPercentage) / 2).toFixed(2)}%)`,
+        "",
+        "",
+        "",
+        "",
+        (sGst ?? 0).toFixed(2),
+      ]);
+      rows.push([
+        `Total GST @ ${Number(gstPercentage).toFixed(2)}%`,
+        "",
+        "",
+        "",
+        "",
+        gstAmount.toFixed(2),
+      ]);
+    }
+
+    rows.push(["Round Off", "", "", "", "", roundOff.toFixed(2)]);
+    rows.push(["Grand Total", "", "", "", "", grandTotal.toFixed(2)]);
+
+    // --- Convert to CSV string ---
+    const csvContent = rows
+      .map((row) => row.map((cell) => `"${cell ?? ""}"`).join(","))
+      .join("\n");
+
+    // --- Trigger Download ---
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice_${invoiceNumber || "untitled"}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadInvoice = (e) => {
+    e.preventDefault();
+
+    const isBuyerIncomplete =
+      !buyer.name || !buyer.address || !buyer.phone || !buyer.email;
+
+    const isConsigneeIncomplete =
+      !consignee.name ||
+      !consignee.address ||
+      !consignee.phone ||
+      !consignee.email;
+
+    if (isBuyerIncomplete && isConsigneeIncomplete) {
+      toast.error("Please enter the details of Buyer and Consignee");
+      return;
+    }
+
+    if (addItems.length === 0) {
+      toast.error("There are no items in the invoice");
+      return;
+    }
+
+    if (!invoiceNumber) {
+      toast.error("Plase enter invoice number");
+      return;
+    }
+
+    if (!hsnSAC) {
+      toast.error("Please enter the HSN/SAC value");
+      return;
+    }
+
+    if (gst && !gstPercentage) {
+      toast.error("Please enter the GST Percentage");
+      return;
+    }
+
+    if (gst && !ewayNumber) {
+      toast.error("Please enter the E-way bill number");
+      return;
+    }
+
+    window.print();
+    toast.success("Invoice generated successfully");
+
+    downloadCSV();
+
+    const next = getNextInvoiceNumber();
+    setInvoiceNumber(next);
+  };
 
   return (
     <div className="a4">
@@ -51,7 +237,7 @@ const Preview = () => {
                     key={index}
                     className="space-y-1 text-gray-700 text-sm font-medium"
                   >
-                    <p className="text-xl">{item.name}</p>
+                    <p className="text-base">{item.name}</p>
                     <p>{item.address}</p>
                     <p>
                       <span>Phone:</span> {item.phone}
@@ -69,7 +255,7 @@ const Preview = () => {
             )}
           </section>
           <section className="border-b p-2 text-sm font-medium text-gray-700 space-y-1">
-            <p className="text-xl">{buyer.name}</p>
+            <p className="text-base">{buyer.name}</p>
             <p>{buyer.address}</p>
             <p>
               <span>Phone:</span> {buyer.phone}
@@ -84,7 +270,7 @@ const Preview = () => {
             )}
           </section>
           <section className="p-2 text-sm font-medium text-gray-700 space-y-1">
-            <p className="text-xl">{consignee.name}</p>
+            <p className="text-base">{consignee.name}</p>
             <p>{consignee.address}</p>
             <p>
               <span>Phone:</span> {consignee.phone}
@@ -109,7 +295,7 @@ const Preview = () => {
                 </td>
                 <td className="w-1/2 p-2 border-b">
                   <p>Date:</p>
-                  {date}
+                  {formatDate(date)}
                 </td>
               </tr>
               <tr>
@@ -207,12 +393,11 @@ const Preview = () => {
               </tr>
             ))}
 
-            {[...Array(5)].map((_, i) => (
+            {[...Array(Math.max(5 - addItems.length, 0))].map((_, i) => (
               <tr
                 key={`empty-${i}`}
                 className="text-center text-sm font-medium"
               >
-                <td className="border-r p-2">&nbsp;</td>
                 <td className="border-r p-2">&nbsp;</td>
                 <td className="border-r p-2">&nbsp;</td>
                 <td className="border-r p-2">&nbsp;</td>
@@ -329,27 +514,42 @@ const Preview = () => {
         </div>
       )}
 
-      <div className="w-full flex flex-col p-2 border border-t-0">
-        <div className="w-1/2 flex flex-col justify-end">
+      <div className="w-full flex flex-col text-xs items-end border-x">
+        {sellers.map(
+          (item, index) =>
+            seller === index && (
+              <div className="w-1/2">
+                <p>Company's Bank Details</p>
+                <p>
+                  Bank Name: <strong>{item.bankname}</strong>
+                </p>
+                <p>
+                  A/c No.: <strong>{item.accno}</strong>
+                </p>
+                <p>
+                  Branch & IFS Code: <strong>{item.branchifs}</strong>
+                </p>
+              </div>
+            )
+        )}
+      </div>
+
+      <div className="border border-t-0 font-medium text-xs flex">
+        <section className="p-2 w-1/2 border-r">
+          <p className="underline">Declaration</p>
+          <p>
+            We declare that this invoice shows the actual price of the goods
+            describe and all particulars are true and correct.// OD interest @{" "}
+            {gstPercentage}% p.a. chargeable for payments after due date.//GOODs
+            once sold will not be taken back.//
+          </p>
+        </section>
+        <section className="flex flex-col justify-between items-end text-xs border-t w-1/2 p-2">
           {sellers.map(
-            (item, index) =>
-              seller === index && (
-                <>
-                  <p>Company's Bank Details</p>
-                  <p>
-                    Bank Name: <strong>{item.bankname}</strong>
-                  </p>
-                  <p>
-                    A/c No.: <strong>{item.accno}</strong>
-                  </p>
-                  <p>
-                    Branch & IFS Code: <strong>{item.branchifs}</strong>
-                  </p>
-                </>
-              )
+            (item, index) => seller === index && <p>for {item.name}</p>
           )}
-        </div>
-        <div className=""></div>
+          <p>Authorisec Signatory</p>
+        </section>
       </div>
 
       <div className="flex justify-between items-center w-full my-2 no-print">
@@ -360,7 +560,7 @@ const Preview = () => {
         </Link>
         <button
           type="button"
-          onClick={() => window.print()}
+          onClick={handleDownloadInvoice}
           className="bg-gray-700 p-2 text-white font-medium text-sm rounded w-[20%] hover:bg-gray-950 cursor-pointer"
         >
           Download Invoice

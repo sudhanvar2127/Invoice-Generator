@@ -34,41 +34,18 @@ const OtherDetails = () => {
     termsOfDelivery,
     setTermsOfDelivery,
     hsnSAC,
-    setHSNSAC
+    setHSNSAC,
+    getNextInvoiceNumber
   } = useContext(BillContext);
 
-  function getFinancialYear() {
-    const now = new Date();
-    const month = now.getMonth() + 1; // month is 0-indexed
-    const year = now.getFullYear();
-    if (month >= 4) {
-      // From April to December, current year as start year
-      return `${year}-${(year + 1).toString().slice(-2)}`;
-    } else {
-      // From Jan to March, previous year as start year
-      return `${year - 1}-${year.toString().slice(-2)}`;
-    }
-  }
-
-  function getNextInvoiceNumber() {
-    const fy = getFinancialYear();
-    const key = `inv-serial-${fy}`;
-    let serial = parseInt(localStorage.getItem(key) || "0", 10);
-    serial += 1;
-    localStorage.setItem(key, serial);
-    // Pad with leading zerosx
-    const serialStr = serial.toString().padStart(3, "0");
-    return `${fy}/${serialStr}`;
-  }
-
-  useEffect(() => {
-    if (gst) {
-      const newInvoice = getNextInvoiceNumber();
-      setInvoiceNumber(newInvoice);
-    } else {
-      setInvoiceNumber("");
-    }
-  }, [gst, setInvoiceNumber]);
+  // useEffect(() => {
+  //   if (gst) {
+  //     const newInvoice = getNextInvoiceNumber();
+  //     setInvoiceNumber(newInvoice);
+  //   } else {
+  //     setInvoiceNumber("");
+  //   }
+  // }, [gst, setInvoiceNumber]);
 
   return (
     <div>
