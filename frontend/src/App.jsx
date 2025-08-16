@@ -4,8 +4,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import Navbar from "./Components/Navbar";
 import { Route, Routes } from "react-router-dom";
 import GSTCalulator from "./Pages/GSTCalulator";
-import Bill from "./Pages/Bill";
 import Preview from "./Pages/Preview";
+import AllBills from "./Pages/AllBills";
 
 const App = () => {
   return (
@@ -15,7 +15,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/gstcalulator" element={<GSTCalulator />} />
-        <Route path="/bills" element={<Bill />} />
+        <Route path="/allbills" element={<AllBills />}/>
         <Route path="/preview" element={<Preview />} />
       </Routes>
     </div>

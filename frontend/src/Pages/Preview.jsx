@@ -223,6 +223,46 @@ const Preview = () => {
 
     const next = getNextInvoiceNumber();
     setInvoiceNumber(next);
+
+    // After downloadCSV();
+    const billData = {
+      invoiceNumber,
+      date,
+      deliveryNote,
+      modeAndTermsOfPayment,
+      referenceNumber,
+      otherReference,
+      buyersOrderNumber,
+      dated,
+      dispatchDocNumber,
+      deliveryDateNote,
+      dispatchThrough,
+      destination,
+      termsOfDelivery,
+      ewayNumber,
+      hsnSAC,
+      gst,
+      gstPercentage,
+      cGst,
+      sGst,
+      gstAmount,
+      subTotal,
+      roundOff,
+      grandTotal,
+      seller: sellers[seller],
+      buyer,
+      consignee,
+      items: addItems,
+    };
+
+    // Load existing bills from localStorage
+    let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
+
+    // Append the new bill
+    allBills.push(billData);
+
+    // Save back to localStorage
+    localStorage.setItem("allBills", JSON.stringify(allBills));
   };
 
   return (
