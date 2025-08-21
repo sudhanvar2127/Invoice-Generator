@@ -40,6 +40,9 @@ const Preview = () => {
     sGst,
     getNextInvoiceNumber,
     setInvoiceNumber,
+    setBillData,
+    allBills,
+    setAllBills,
   } = useContext(BillContext);
 
   const formatDate = (dateStr) => {
@@ -216,16 +219,15 @@ const Preview = () => {
       return;
     }
 
-    window.print();
-    toast.success("Invoice generated successfully");
+    const generateBillId = () => {
+      return (
+        Date.now().toString(36) + // timestamp in base36
+        Math.random().toString(36).substring(2, 8)
+      ).toUpperCase();
+    };
 
-    downloadCSV();
-
-    const next = getNextInvoiceNumber();
-    setInvoiceNumber(next);
-
-    // After downloadCSV();
-    const billData = {
+    const newBillData = {
+      id: generateBillId(),
       invoiceNumber,
       date,
       deliveryNote,
@@ -255,14 +257,19 @@ const Preview = () => {
       items: addItems,
     };
 
-    // Load existing bills from localStorage
-    let allBills = JSON.parse(localStorage.getItem("allBills")) || [];
+    const updatedBills = [...allBills, newBillData];
+    setAllBills(updatedBills);
+    localStorage.setItem("Bills", JSON.stringify(updatedBills));
 
-    // Append the new bill
-    allBills.push(billData);
+    setBillData(newBillData);
 
-    // Save back to localStorage
-    localStorage.setItem("allBills", JSON.stringify(allBills));
+    window.print();
+    toast.success("Invoice generated successfully");
+
+    downloadCSV();
+
+    const next = getNextInvoiceNumber();
+    setInvoiceNumber(next);
   };
 
   return (

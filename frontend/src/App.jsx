@@ -5,7 +5,7 @@ import Navbar from "./Components/Navbar";
 import { Route, Routes } from "react-router-dom";
 import GSTCalulator from "./Pages/GSTCalulator";
 import Preview from "./Pages/Preview";
-import AllBills from "./Pages/AllBills";
+import Bills from "./Pages/Bills";
 
 const App = () => {
   return (
@@ -15,8 +15,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/gstcalulator" element={<GSTCalulator />} />
-        <Route path="/allbills" element={<AllBills />}/>
+        <Route path="/bills" element={<Bills />}/>
         <Route path="/preview" element={<Preview />} />
+        {/* <Route path="/bills/:id" element={<BillShow />} /> */}
       </Routes>
     </div>
   );

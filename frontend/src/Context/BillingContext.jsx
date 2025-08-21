@@ -1,5 +1,5 @@
 import React, { use } from "react";
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 
 export const BillContext = createContext();
 
@@ -82,6 +82,10 @@ const BillContextProvide = (props) => {
   const [grandTotal, setGrandTotal] = useState(0);
   const [cGst, setCGST] = useState(0);
   const [sGst, setSGST] = useState(0);
+  const [billData, setBillData] = useState(null);
+  const [allBills, setAllBills] = useState(() => {
+    return JSON.parse(localStorage.getItem("Bills")) || [];
+  });
 
   function getFinancialYear() {
     const now = new Date();
@@ -104,6 +108,13 @@ const BillContextProvide = (props) => {
     localStorage.setItem("currentInvoiceNumber", nextNumber);
     return nextNumber;
   }
+
+  useEffect(() => {
+    const savedBills = JSON.parse(localStorage.getItem("Bills")) || [];
+    if (savedBills.length > 0) {
+      setBillData(savedBills[savedBills.length - 1]); // load last saved
+    }
+  }, []);
 
   const value = {
     sellers,
@@ -170,6 +181,10 @@ const BillContextProvide = (props) => {
     sGst,
     setSGST,
     getNextInvoiceNumber,
+    billData,
+    setBillData,
+    allBills,
+    setAllBills
   };
 
   return (
