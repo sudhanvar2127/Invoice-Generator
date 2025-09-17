@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BillContext } from "../Context/BillingContext";
 import BillShow from "../Components/BillShow";
 
 const Bills = () => {
-  const { allBills } = useContext(BillContext);
+  const { allBills, setAllBills } = useContext(BillContext);
+  const navigate = useNavigate();
 
   const [filterBills, setFilterBills] = useState([]);
   const [selectedSellers, setSelectedSellers] = useState([]);
@@ -23,6 +25,108 @@ const Bills = () => {
     setSelectedBillTypes((prev) =>
       checked ? [...prev, value] : prev.filter((v) => v !== value)
     );
+  };
+
+  // Download CSV for specific bill
+  const downloadBillCSV = (bill) => {
+    const formatDate = (dateStr) => {
+      if (!dateStr) return "";
+      const dateObj = new Date(dateStr);
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const year = dateObj.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
+    const rows = [];
+
+    // --- Seller Section ---
+    if (bill.seller) {
+      rows.push(["Seller Details"]);
+      rows.push(["Name", bill.seller.name || ""]);
+      rows.push(["Address", bill.seller.address || ""]);
+      rows.push(["Phone", bill.seller.phone || ""]);
+      rows.push(["Email", bill.seller.email || ""]);
+      if (bill.seller.gstin) rows.push(["GSTIN", bill.seller.gstin]);
+      rows.push([]);
+    }
+
+    // --- Buyer Section ---
+    rows.push(["Buyer Details"]);
+    rows.push(["Name", bill.buyer?.name || ""]);
+    rows.push(["Address", bill.buyer?.address || ""]);
+    rows.push(["Phone", bill.buyer?.phone || ""]);
+    rows.push(["Email", bill.buyer?.email || ""]);
+    if (bill.buyer?.gstin) rows.push(["GSTIN", bill.buyer.gstin]);
+    rows.push([]);
+
+    // --- Consignee Section ---
+    rows.push(["Consignee Details"]);
+    rows.push(["Name", bill.consignee?.name || ""]);
+    rows.push(["Address", bill.consignee?.address || ""]);
+    rows.push(["Phone", bill.consignee?.phone || ""]);
+    rows.push(["Email", bill.consignee?.email || ""]);
+    if (bill.consignee?.gstin) rows.push(["GSTIN", bill.consignee.gstin]);
+    rows.push([]);
+
+    // --- Invoice Details ---
+    rows.push(["Invoice Details"]);
+    rows.push(["Invoice Number", bill.invoiceNumber || ""]);
+    rows.push(["Date", formatDate(bill.date) || ""]);
+    rows.push(["HSN/SAC", bill.hsnSAC || ""]);
+    rows.push([]);
+
+    // --- Items ---
+    rows.push(["Sl.No", "Description of Goods", "HSN/SAC", "Quantity", "Rate", "Amount"]);
+    bill.items?.forEach((item, index) => {
+      rows.push([
+        index + 1,
+        item.descriptionOfGoods || "",
+        bill.hsnSAC || "",
+        item.quantity || "",
+        item.rate || "",
+        item.amount || "",
+      ]);
+    });
+    rows.push([]);
+
+    // --- Totals ---
+    rows.push(["Sub Total", "", "", "", "", bill.subTotal?.toFixed(2) || ""]);
+    if (bill.gst && bill.gstPercentage) {
+      rows.push([
+        `CGST (${(Number(bill.gstPercentage) / 2).toFixed(2)}%)`,
+        "",
+        "",
+        "",
+        "",
+        (bill.cGst ?? 0).toFixed(2),
+      ]);
+      rows.push([
+        `SGST (${(Number(bill.gstPercentage) / 2).toFixed(2)}%)`,
+        "",
+        "",
+        "",
+        "",
+        (bill.sGst ?? 0).toFixed(2),
+      ]);
+    }
+    rows.push(["Round Off", "", "", "", "", bill.roundOff?.toFixed(2) || ""]);
+    rows.push(["Grand Total", "", "", "", "", bill.grandTotal?.toFixed(2) || ""]);
+
+    // --- Convert to CSV and download ---
+    const csvContent = rows
+      .map((row) => row.map((cell) => `"${cell ?? ""}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice_${bill.invoiceNumber || "untitled"}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Filter bills based on filters
@@ -50,7 +154,7 @@ const Bills = () => {
   }, [allBills, selectedSellers, selectedBillTypes, sortOption]);
 
   return (
-    <div className="flex gap-10">
+    <div className="flex gap-10 p-6">
       {/* Filters */}
       <div className="min-w-60">
         <p className="my-2 text-xl flex items-center cursor-pointer gap-2">
@@ -107,10 +211,10 @@ const Bills = () => {
 
       {/* Bills List */}
       <div className="flex-1">
-        <div className="flex justify-between text-base mb-2">
+        <div className="flex justify-between text-base mb-6">
           <h1 className="text-2xl font-medium">All Bills</h1>
           <select
-            className="border-2 border-gray-300 text-sm px-2"
+            className="border-2 border-gray-300 text-sm px-2 py-1 rounded"
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
           >
@@ -118,11 +222,62 @@ const Bills = () => {
             <option value="invoicenumber">Sort by: Invoice Number</option>
           </select>
         </div>
-        <div className="flex flex-col">
+
+        <div className="space-y-4">
           {filterBills.length === 0 ? (
-            <p className="text-gray-500 mt-5">No bills found.</p>
+            <p className="text-gray-500 mt-5 text-center">No bills found.</p>
           ) : (
-            filterBills.map((bill) => <BillShow key={bill.id} bill={bill} />)
+            filterBills.map((bill) => (
+              <div key={bill.id} className="border rounded-lg p-4 bg-white shadow-sm">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="font-semibold text-lg">
+                      Invoice: {bill.invoiceNumber}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Date: {bill.date} | {bill.gst ? "GST" : "Non-GST"}
+                    </div>
+                    <div className="text-sm mt-2">
+                      <span className="font-medium">Seller:</span> {bill.seller?.name || "-"}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-medium">Buyer:</span> {bill.buyer?.name || "-"}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-medium">Amount:</span> ₹{bill.grandTotal?.toFixed(2) || "0.00"}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 ml-4">
+                    <button
+                      onClick={() => navigate(`/bills/${bill.id}`)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                    >
+                      Preview
+                    </button>
+                    <button
+                      onClick={() => navigate(`/bills/${bill.id}/edit`)}
+                      className="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => downloadBillCSV(bill)}
+                      className="bg-gray-700 text-white px-3 py-1 rounded text-sm hover:bg-gray-800"
+                    >
+                      Download CSV
+                    </button>
+                  </div>
+                </div>
+
+                {bill.items && bill.items.length > 0 && (
+                  <div className="text-xs mt-2 text-gray-600">
+                    <span className="font-medium">Items:</span>{" "}
+                    {bill.items.map((item) => item.descriptionOfGoods).join(", ")}
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
       </div>
