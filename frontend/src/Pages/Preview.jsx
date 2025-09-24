@@ -243,11 +243,11 @@ const Preview = () => {
                 <td className="border-r p-2">{hsnSAC}</td>
                 <td className="border-r p-2">{item.quantity}</td>
                 <td className="border-r p-2">{item.rate}</td>
-                <td className="border-r p-2">{item.amount}</td>
+                <td className="border-r p-2">{item.amount.toFixed(2)}</td>
               </tr>
             ))}
 
-            {[...Array(Math.max(16 - addItems.length, 0))].map((_, i) => (
+            {[...Array(Math.max(19 - addItems.length, 0))].map((_, i) => (
               <tr
                 key={`empty-${i}`}
                 className="text-center text-sm font-medium"

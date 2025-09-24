@@ -1,16 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BillContext } from "../Context/BillingContext";
-import BillShow from "../Components/BillShow";
 
 const Bills = () => {
   const { allBills, setAllBills } = useContext(BillContext);
   const navigate = useNavigate();
 
   const [filterBills, setFilterBills] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSellers, setSelectedSellers] = useState([]);
   const [selectedBillTypes, setSelectedBillTypes] = useState([]);
   const [sortOption, setSortOption] = useState("date");
+
+  // Search function
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
 
   // Handle filters
   const handleSellerFilterChange = (e) => {
@@ -40,7 +45,7 @@ const Bills = () => {
 
     const rows = [];
 
-    // --- Seller Section ---
+    // Seller Section
     if (bill.seller) {
       rows.push(["Seller Details"]);
       rows.push(["Name", bill.seller.name || ""]);
@@ -51,7 +56,7 @@ const Bills = () => {
       rows.push([]);
     }
 
-    // --- Buyer Section ---
+    // Buyer Section
     rows.push(["Buyer Details"]);
     rows.push(["Name", bill.buyer?.name || ""]);
     rows.push(["Address", bill.buyer?.address || ""]);
@@ -60,7 +65,7 @@ const Bills = () => {
     if (bill.buyer?.gstin) rows.push(["GSTIN", bill.buyer.gstin]);
     rows.push([]);
 
-    // --- Consignee Section ---
+    // Consignee Section
     rows.push(["Consignee Details"]);
     rows.push(["Name", bill.consignee?.name || ""]);
     rows.push(["Address", bill.consignee?.address || ""]);
@@ -69,14 +74,14 @@ const Bills = () => {
     if (bill.consignee?.gstin) rows.push(["GSTIN", bill.consignee.gstin]);
     rows.push([]);
 
-    // --- Invoice Details ---
+    // Invoice Details
     rows.push(["Invoice Details"]);
     rows.push(["Invoice Number", bill.invoiceNumber || ""]);
     rows.push(["Date", formatDate(bill.date) || ""]);
     rows.push(["HSN/SAC", bill.hsnSAC || ""]);
     rows.push([]);
 
-    // --- Items ---
+    // Items
     rows.push(["Sl.No", "Description of Goods", "HSN/SAC", "Quantity", "Rate", "Amount"]);
     bill.items?.forEach((item, index) => {
       rows.push([
@@ -90,8 +95,8 @@ const Bills = () => {
     });
     rows.push([]);
 
-    // --- Totals ---
-    rows.push(["Sub Total", "", "", "", "", bill.subTotal?.toFixed(2) || ""]);
+    // Totals
+    rows.push(["Sub Total", "", "", "", "", Number(bill.subTotal || 0).toFixed(2) || ""]);
     if (bill.gst && bill.gstPercentage) {
       rows.push([
         `CGST (${(Number(bill.gstPercentage) / 2).toFixed(2)}%)`,
@@ -99,7 +104,7 @@ const Bills = () => {
         "",
         "",
         "",
-        (bill.cGst ?? 0).toFixed(2),
+        Number(bill.cGst || 0).toFixed(2),
       ]);
       rows.push([
         `SGST (${(Number(bill.gstPercentage) / 2).toFixed(2)}%)`,
@@ -107,13 +112,12 @@ const Bills = () => {
         "",
         "",
         "",
-        (bill.sGst ?? 0).toFixed(2),
+        Number(bill.sGst || 0).toFixed(2),
       ]);
     }
-    rows.push(["Round Off", "", "", "", "", bill.roundOff?.toFixed(2) || ""]);
-    rows.push(["Grand Total", "", "", "", "", bill.grandTotal?.toFixed(2) || ""]);
+    rows.push(["Round Off", "", "", "", "", Number(bill.roundOff || 0).toFixed(2) || ""]);
+    rows.push(["Grand Total", "", "", "", "", Number(bill.grandTotal || 0).toFixed(2) || ""]);
 
-    // --- Convert to CSV and download ---
     const csvContent = rows
       .map((row) => row.map((cell) => `"${cell ?? ""}"`).join(","))
       .join("\n");
@@ -129,20 +133,38 @@ const Bills = () => {
     URL.revokeObjectURL(url);
   };
 
-  // Filter bills based on filters
+  // Filter bills based on search and filters
   useEffect(() => {
     let filtered = [...allBills];
+
+    // Apply search filter
+    if (searchQuery.trim() !== "") {
+      filtered = filtered.filter((bill) =>
+        bill.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        bill.seller?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        bill.buyer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        bill.consignee?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        bill.items?.some(item => 
+          item.descriptionOfGoods?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+
+    // Apply seller filter
     if (selectedSellers.length > 0) {
       filtered = filtered.filter((bill) =>
         selectedSellers.includes(bill.seller?.name)
       );
     }
+
+    // Apply bill type filter
     if (selectedBillTypes.length > 0) {
       filtered = filtered.filter((bill) =>
         selectedBillTypes.includes(bill.gst ? "Gst" : "Non-Gst")
       );
     }
-    // Sorting:
+
+    // Apply sorting
     if (sortOption === "date") {
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else if (sortOption === "invoicenumber") {
@@ -150,8 +172,9 @@ const Bills = () => {
         String(b.invoiceNumber).localeCompare(String(a.invoiceNumber))
       );
     }
+
     setFilterBills(filtered);
-  }, [allBills, selectedSellers, selectedBillTypes, sortOption]);
+  }, [allBills, searchQuery, selectedSellers, selectedBillTypes, sortOption]);
 
   return (
     <div className="flex gap-10 p-6">
@@ -160,6 +183,7 @@ const Bills = () => {
         <p className="my-2 text-xl flex items-center cursor-pointer gap-2">
           Filters
         </p>
+
         <div className="border border-gray-300 pl-5 py-3 mt-6">
           <p className="mb-3 text-sm font-medium">Seller Name</p>
           <div className="flex flex-col gap-2 text-sm font-light">
@@ -211,8 +235,10 @@ const Bills = () => {
 
       {/* Bills List */}
       <div className="flex-1">
-        <div className="flex justify-between text-base mb-6">
-          <h1 className="text-2xl font-medium">All Bills</h1>
+        <div className="flex justify-between text-base mb-4">
+          <h1 className="text-2xl font-medium">
+            All Bills ({filterBills.length})
+          </h1>
           <select
             className="border-2 border-gray-300 text-sm px-2 py-1 rounded"
             value={sortOption}
@@ -223,9 +249,22 @@ const Bills = () => {
           </select>
         </div>
 
+        {/* Search Box - Moved here after All Bills heading */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by invoice number, seller, buyer, items..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full border border-gray-300 rounded px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
         <div className="space-y-4">
           {filterBills.length === 0 ? (
-            <p className="text-gray-500 mt-5 text-center">No bills found.</p>
+            <p className="text-gray-500 mt-5 text-center">
+              {searchQuery ? `No bills found for "${searchQuery}"` : "No bills found."}
+            </p>
           ) : (
             filterBills.map((bill) => (
               <div key={bill.id} className="border rounded-lg p-4 bg-white shadow-sm">
@@ -244,7 +283,7 @@ const Bills = () => {
                       <span className="font-medium">Buyer:</span> {bill.buyer?.name || "-"}
                     </div>
                     <div className="text-sm">
-                      <span className="font-medium">Amount:</span> ₹{bill.grandTotal?.toFixed(2) || "0.00"}
+                      <span className="font-medium">Amount:</span> ₹{Number(bill.grandTotal || 0).toFixed(2) || "0.00"}
                     </div>
                   </div>
 
@@ -265,7 +304,7 @@ const Bills = () => {
                       onClick={() => downloadBillCSV(bill)}
                       className="bg-gray-700 text-white px-3 py-1 rounded text-sm hover:bg-gray-800"
                     >
-                      Download CSV
+                      Download
                     </button>
                   </div>
                 </div>

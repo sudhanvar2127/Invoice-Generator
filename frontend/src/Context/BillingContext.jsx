@@ -14,7 +14,7 @@ const BillContextProvide = (props) => {
         "# 495/15, Bharath Poultry Form, Nittuvalli Road, Near R.V.V.S. ITI College, Davangere - 577004",
       gstin: "29ABSPH4496G1Z0",
       bankname: "Karanataka Grameena Bank",
-      accno: 123456789,
+      accno: 10590130002112,
       branchifs: "Karnataka Grameena Bank, Main Branch, PKGB0010590",
     },
     {
@@ -44,24 +44,22 @@ const BillContextProvide = (props) => {
       branchifs: "",
     },
   ]);
-  const [buyer, setBuyer] = useState([
-    {
-      name: "",
-      address: "",
-      phone: "",
-      gstin: "",
-      email: "",
-    },
-  ]);
-  const [consignee, setConsignee] = useState([
-    {
-      name: "",
-      address: "",
-      phone: "",
-      gstin: "",
-      email: "",
-    },
-  ]);
+  const [buyer, setBuyer] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    gstin: "",
+    email: "",
+  });
+
+  const [consignee, setConsignee] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    gstin: "",
+    email: "",
+  });
+
   const [date, setDate] = useState(
     () => new Date().toISOString().split("T")[0]
   );
@@ -128,8 +126,13 @@ const BillContextProvide = (props) => {
     let serial = parseInt(localStorage.getItem(key) || "0", 10);
     serial += 1;
     localStorage.setItem(key, serial);
+
     const nextNumber = `${fy}/${serial.toString().padStart(3, "0")}`;
+
+    // ✅ Update both localStorage and React state
     localStorage.setItem("currentInvoiceNumber", nextNumber);
+    setInvoiceNumber(nextNumber);
+
     return nextNumber;
   }
 
@@ -164,12 +167,6 @@ const BillContextProvide = (props) => {
     setAllBills([]);
     setBillData(null);
   }
-
-  useEffect(() => {
-    if (invoiceNumber) {
-      localStorage.setItem("currentInvoiceNumber", invoiceNumber);
-    }
-  }, [invoiceNumber]);
 
   const value = {
     sellers,

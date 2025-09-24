@@ -182,7 +182,7 @@ const BillViewer = () => {
               </tr>
             ))}
 
-            {[...Array(Math.max(16 - (bill.items?.length || 0), 0))].map((_, i) => (
+            {[...Array(Math.max(19 - (bill.items?.length || 0), 0))].map((_, i) => (
               <tr
                 key={`empty-${i}`}
                 className="text-center text-sm font-medium"
@@ -205,7 +205,7 @@ const BillViewer = () => {
                     Sub Total
                   </td>
                   <td className="border p-2 text-end">
-                    ₹ {bill.subTotal?.toFixed(2) || "0.00"}
+                    ₹ {Number(bill.subTotal || 0).toFixed(2) || "0.00"}
                   </td>
                 </tr>
                 <tr>
@@ -213,7 +213,7 @@ const BillViewer = () => {
                     CGST ({((bill.gstPercentage || 0) / 2).toFixed(2)}%)
                   </td>
                   <td className="border p-2 text-end">
-                    {(bill.cGst ?? 0).toFixed(2)}
+                    {Number(bill.cGst || 0).toFixed(2)}
                   </td>
                 </tr>
                 <tr>
@@ -221,7 +221,7 @@ const BillViewer = () => {
                     SGST ({((bill.gstPercentage || 0) / 2).toFixed(2)}%)
                   </td>
                   <td className="border p-2 text-end">
-                    {(bill.sGst ?? 0).toFixed(2)}
+                    {Number(bill.sGst || 0).toFixed(2)}
                   </td>
                 </tr>
               </>
@@ -230,13 +230,13 @@ const BillViewer = () => {
               <td colSpan={5} className="border p-2 text-end">
                 Round Off
               </td>
-              <td className="border p-2 text-end">{bill.roundOff?.toFixed(2) || "0.00"}</td>
+              <td className="border p-2 text-end">{Number(bill.roundOff || 0).toFixed(2) || "0.00"}</td>
             </tr>
             <tr>
               <td colSpan={5} className="border p-2 text-end">
                 Grand Total
               </td>
-              <td className="border p-2 text-end">₹ {bill.grandTotal?.toFixed(2) || "0.00"}</td>
+              <td className="border p-2 text-end">₹ {Number(bill.grandTotal || 0).toFixed(2) || "0.00"}</td>
             </tr>
             <tr>
               <td colSpan={6} className="p-2">
@@ -279,16 +279,16 @@ const BillViewer = () => {
             <tbody>
               <tr className="text-center text-sm font-medium">
                 <td className="border p-2">{bill.hsnSAC || ""}</td>
-                <td className="border p-2">{bill.subTotal?.toFixed(2) || "0.00"}</td>
+                <td className="border p-2">{Number(bill.subTotal || 0).toFixed(2) || "0.00"}</td>
                 <td className="border p-2">
                   {((bill.gstPercentage || 0) / 2).toFixed(2)}%
                 </td>
-                <td className="border p-2">{(bill.cGst ?? 0).toFixed(2)}</td>
+                <td className="border p-2">{Number(bill.cGst || 0).toFixed(2)}</td>
                 <td className="border p-2">
                   {((bill.gstPercentage || 0) / 2).toFixed(2)}%
                 </td>
-                <td className="border p-2">{(bill.sGst ?? 0).toFixed(2)}</td>
-                <td className="border p-2">{bill.gstAmount?.toFixed(2) || "0.00"}</td>
+                <td className="border p-2">{Number(bill.sGst || 0).toFixed(2)}</td>
+                <td className="border p-2">{Number(bill.gstAmount || 0).toFixed(2) || "0.00"}</td>
               </tr>
             </tbody>
 

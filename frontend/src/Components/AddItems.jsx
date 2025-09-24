@@ -89,7 +89,15 @@ const AddItems = () => {
     }
 
     const rawTotal = subtotalCalc + gstAmtCalc;
-    const roundedTotal = Math.ceil(rawTotal); // Round up to next integer
+    let roundedTotal;
+
+    const decimalPart = rawTotal - Math.floor(rawTotal);
+    if (decimalPart <= 0.5) {
+      roundedTotal = Math.floor(rawTotal);
+    } else {
+      roundedTotal = Math.ceil(rawTotal);
+    }
+
     const roundOffValue = roundedTotal - rawTotal;
 
     setRoundOff(roundOffValue);
@@ -171,7 +179,7 @@ const AddItems = () => {
                 <td className="border p-2">{hsnSAC}</td>
                 <td className="border p-2">{item.quantity}</td>
                 <td className="border p-2">{item.rate}</td>
-                <td className="border p-2">{item.amount}</td>
+                <td className="border p-2">{item.amount.toFixed(2)}</td>
                 <td>
                   <button
                     className="bg-red-700 text-white py-1 rounded text-sm px-2 cursor-pointer"

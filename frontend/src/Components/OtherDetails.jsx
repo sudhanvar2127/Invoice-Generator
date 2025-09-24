@@ -38,14 +38,12 @@ const OtherDetails = () => {
     getNextInvoiceNumber
   } = useContext(BillContext);
 
-  // useEffect(() => {
-  //   if (gst) {
-  //     const newInvoice = getNextInvoiceNumber();
-  //     setInvoiceNumber(newInvoice);
-  //   } else {
-  //     setInvoiceNumber("");
-  //   }
-  // }, [gst, setInvoiceNumber]);
+  useEffect(() => {
+    if (invoiceNumber) {
+      localStorage.setItem("currentInvoiceNumber", invoiceNumber);
+    }
+  }, [invoiceNumber]);
+
 
   return (
     <div>
