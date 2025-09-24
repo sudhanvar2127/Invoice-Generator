@@ -43,6 +43,7 @@ const Preview = () => {
     setBillData,
     allBills,
     setAllBills,
+    nonGstSellerDetails, // Added this
   } = useContext(BillContext);
 
   const formatDate = (dateStr) => {
@@ -54,33 +55,57 @@ const Preview = () => {
     return `${day}-${month}-${year}`;
   };
 
+  // Safe seller details for non-GST mode
+  const safeSellerDetails = nonGstSellerDetails || {
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    bankname: "",
+    accno: "",
+    branchifs: "",
+  };
+
   return (
     <div className="a4">
       <div className="flex border border-b-0">
         <div className="flex flex-col w-3/5">
           <section className="border-b p-2">
-            {sellers.map(
-              (item, index) =>
-                seller === index && (
-                  <div
-                    key={index}
-                    className="space-y-1 text-gray-700 text-sm font-medium"
-                  >
-                    <p className="text-base">{item.name}</p>
-                    <p>{item.address}</p>
-                    <p>
-                      <span>Phone:</span> {item.phone}
-                    </p>
-                    <p>
-                      <span>Email:</span> {item.email}
-                    </p>
-                    {gst && (
+            {gst ? (
+              // GST Mode - Show selected seller from sellers array
+              sellers.map(
+                (item, index) =>
+                  seller === index && (
+                    <div
+                      key={index}
+                      className="space-y-1 text-gray-700 text-sm font-medium"
+                    >
+                      <p className="text-base">{item.name}</p>
+                      <p>{item.address}</p>
+                      <p>
+                        <span>Phone:</span> {item.phone}
+                      </p>
+                      <p>
+                        <span>Email:</span> {item.email}
+                      </p>
                       <p>
                         <span>GSTIN/UIN:</span> {item.gstin}
                       </p>
-                    )}
-                  </div>
-                )
+                    </div>
+                  )
+              )
+            ) : (
+              // Non-GST Mode - Show nonGstSellerDetails
+              <div className="space-y-1 text-gray-700 text-sm font-medium">
+                <p className="text-base">{safeSellerDetails.name || ""}</p>
+                <p>{safeSellerDetails.address || ""}</p>
+                <p>
+                  <span>Phone:</span> {safeSellerDetails.phone || ""}
+                </p>
+                <p>
+                  <span>Email:</span> {safeSellerDetails.email || ""}
+                </p>
+              </div>
             )}
           </section>
           <section className="border-b p-2 text-sm font-medium text-gray-700 space-y-1">
@@ -232,6 +257,7 @@ const Preview = () => {
                 <td className="border-r p-2">&nbsp;</td>
                 <td className="border-r p-2">&nbsp;</td>
                 <td className="border-r p-2">&nbsp;</td>
+                <td className="border-r p-2">&nbsp;</td>
               </tr>
             ))}
           </tbody>
@@ -304,7 +330,7 @@ const Preview = () => {
                   SGST/UTGST
                 </td>
                 <td rowSpan={2} className="p-2 border-r">
-                  Total Tax Amout
+                  Total Tax Amount
                 </td>
               </tr>
               <tr>
@@ -344,22 +370,41 @@ const Preview = () => {
       )}
 
       <div className="w-full flex flex-col text-xs items-end border-x">
-        {sellers.map(
-          (item, index) =>
-            seller === index && (
-              <div className="w-1/2">
-                <p>Company's Bank Details</p>
-                <p>
-                  Bank Name: <strong>{item.bankname}</strong>
-                </p>
-                <p>
-                  A/c No.: <strong>{item.accno}</strong>
-                </p>
-                <p>
-                  Branch & IFS Code: <strong>{item.branchifs}</strong>
-                </p>
-              </div>
-            )
+        {gst ? (
+          // GST Mode - Show bank details from selected seller
+          sellers.map(
+            (item, index) =>
+              seller === index && (
+                <div key={index} className="w-1/2">
+                  <p>Company's Bank Details</p>
+                  <p>
+                    Bank Name: <strong>{item.bankname}</strong>
+                  </p>
+                  <p>
+                    A/c No.: <strong>{item.accno}</strong>
+                  </p>
+                  <p>
+                    Branch & IFS Code: <strong>{item.branchifs}</strong>
+                  </p>
+                </div>
+              )
+          )
+        ) : (
+          // Non-GST Mode - Show bank details from nonGstSellerDetails
+          safeSellerDetails.bankname && (
+            <div className="w-1/2">
+              <p>Company's Bank Details</p>
+              <p>
+                Bank Name: <strong>{safeSellerDetails.bankname}</strong>
+              </p>
+              <p>
+                A/c No.: <strong>{safeSellerDetails.accno}</strong>
+              </p>
+              <p>
+                Branch & IFS Code: <strong>{safeSellerDetails.branchifs}</strong>
+              </p>
+            </div>
+          )
         )}
       </div>
 
@@ -376,10 +421,14 @@ const Preview = () => {
               </p>
             </section>
             <section className="flex flex-col justify-between items-end text-xs border-t w-1/2 p-2">
-              {sellers.map(
-                (item, index) => seller === index && <p>for {item.name}</p>
+              {gst ? (
+                sellers.map(
+                  (item, index) => seller === index && <p key={index}>for {item.name}</p>
+                )
+              ) : (
+                <p>for {safeSellerDetails.name}</p>
               )}
-              <p>Authorisec Signatory</p>
+              <p>Authorised Signatory</p>
             </section>
           </div>
         </>

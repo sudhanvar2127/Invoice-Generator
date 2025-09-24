@@ -56,120 +56,165 @@ const GenerateBill = () => {
   const downloadCSV = () => {
     const rows = [];
 
-    // --- Seller Section ---
-    const currentSeller = sellers[seller];
-    if (currentSeller) {
-      rows.push(["Seller Details"]);
-      rows.push(["Name", currentSeller.name || ""]);
-      rows.push(["Address", currentSeller.address || ""]);
-      rows.push(["Phone", currentSeller.phone || ""]);
-      rows.push(["Email", currentSeller.email || ""]);
-      if (currentSeller.gstin) rows.push(["GSTIN", currentSeller.gstin]);
-      rows.push([]);
-    }
+    // --- Header Section (Company Name and Month) ---
+    const currentSeller = gst ? sellers[seller] : nonGstSellerDetails;
 
-    // --- Buyer Section ---
-    rows.push(["Buyer Details"]);
-    rows.push(["Name", buyer.name || ""]);
-    rows.push(["Address", buyer.address || ""]);
-    rows.push(["Phone", buyer.phone || ""]);
-    rows.push(["Email", buyer.email || ""]);
-    if (buyer.gstin) rows.push(["GSTIN", buyer.gstin]);
-    rows.push([]);
-
-    // --- Consignee Section ---
-    rows.push(["Consignee Details"]);
-    rows.push(["Name", consignee.name || ""]);
-    rows.push(["Address", consignee.address || ""]);
-    rows.push(["Phone", consignee.phone || ""]);
-    rows.push(["Email", consignee.email || ""]);
-    if (consignee.gstin) rows.push(["GSTIN", consignee.gstin]);
-    rows.push([]);
-
-    // --- Invoice Header Information ---
-    rows.push(["Invoice Details"]);
-    rows.push(["Invoice Number", invoiceNumber || ""]);
-    rows.push(["Date", formatDate(date) || ""]);
-    rows.push(["Delivery Note", deliveryNote || ""]);
-    rows.push(["Mode/Terms of Payment", modeAndTermsOfPayment || ""]);
-    rows.push(["Reference No. & Date", referenceNumber || ""]);
-    rows.push(["Other Reference", otherReference || ""]);
-    rows.push(["Buyer's Order Number", buyersOrderNumber || ""]);
-    rows.push(["Dated", dated || ""]);
-    rows.push(["Dispatch Doc No.", dispatchDocNumber || ""]);
-    rows.push(["Delivery Note Date", deliveryDateNote || ""]);
-    rows.push(["Dispatched Through", dispatchThrough || ""]);
-    rows.push(["Destination", destination || ""]);
-    rows.push(["Terms of Delivery", termsOfDelivery || ""]);
-    rows.push(["E-way Bill No.", ewayNumber || ""]);
-    rows.push(["HSN/SAC", hsnSAC || ""]);
-    rows.push([]); // blank row
-
-    // --- Items ---
+    // Header row with company name and date (using your invoice data)
     rows.push([
-      "Sl.No",
-      "Description of Goods",
-      "HSN/SAC",
-      "Quantity",
-      "Rate",
-      "Amount",
+      "",
+      "Monthly Sales Report",
+      "",
+      currentSeller?.name || "Company Name",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      `Date: ${formatDate(date)}`,
+      "",
     ]);
-    addItems.forEach((item, index) => {
-      rows.push([
-        index + 1,
-        item.descriptionOfGoods || "",
-        hsnSAC || "",
-        item.quantity || "",
-        item.rate || "",
-        item.amount || "",
-      ]);
-    });
-    rows.push([]);
 
-    // --- Totals ---
-    rows.push(["Sub Total", "", "", "", "", subTotal.toFixed(2)]);
+    // GST Number row
+    rows.push([
+      "",
+      "",
+      "",
+      `GST No: ${currentSeller?.gstin || "N/A"}`,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
 
-    if (!isNaN(Number(gstPercentage)) && gst) {
-      rows.push([
-        `CGST (${(Number(gstPercentage) / 2).toFixed(2)}%)`,
-        "",
-        "",
-        "",
-        "",
-        (cGst ?? 0).toFixed(2),
-      ]);
-      rows.push([
-        `SGST (${(Number(gstPercentage) / 2).toFixed(2)}%)`,
-        "",
-        "",
-        "",
-        "",
-        (sGst ?? 0).toFixed(2),
-      ]);
-      rows.push([
-        `Total GST @ ${Number(gstPercentage).toFixed(2)}%`,
-        "",
-        "",
-        "",
-        "",
-        gstAmount.toFixed(2),
-      ]);
+    // Statement description
+    rows.push([
+      "",
+      "",
+      "",
+      "Monthly GST Statement for Invoice Processing",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+
+    // Column headers (exact same as Excel)
+    rows.push([
+      "SL No.",
+      "Name of Purchaser & Address",
+      "HSN Code",
+      "Bill No.",
+      "Date",
+      "Quantity",
+      "Purchaser GST No.",
+      "Taxable Value",
+      "GST @ %",
+      "CGST Amt.",
+      "SGST Amt.",
+      "Total Amount",
+    ]);
+
+    // --- Data Row (Your Invoice) ---
+    const taxableValue = parseFloat(subTotal || 0);
+    const cgstAmount = parseFloat(cGst || 0);
+    const sgstAmount = parseFloat(sGst || 0);
+    const grandTotalAmount = parseFloat(grandTotal || 0);
+
+    // Format date like Excel (2025-04-29 00:00:00)
+    const formatExcelDate = (dateStr) => {
+      if (!dateStr) return "";
+      const dateObj = new Date(dateStr);
+      return dateObj.toISOString().split("T")[0] + " 00:00:00";
+    };
+
+    // Combine item quantities and descriptions
+    const itemsDescription = addItems
+      .map((item) => `${item.quantity || ""} ${item.descriptionOfGoods || ""}`)
+      .join(", ");
+
+    // Your invoice data row
+    rows.push([
+      "1",
+      buyer.name || "",
+      hsnSAC || "",
+      invoiceNumber || "",
+      formatExcelDate(date),
+      itemsDescription,
+      buyer.gstin || "",
+      taxableValue,
+      gstPercentage ? gstPercentage / 100 : 0,
+      cgstAmount,
+      sgstAmount,
+      grandTotalAmount,
+    ]);
+
+    // --- Empty rows (matching Excel structure) ---
+    for (let i = 0; i < 16; i++) {
+      rows.push(["", "", "", "", "", "", "", "", "", "", "", ""]);
     }
 
-    rows.push(["Round Off", "", "", "", "", roundOff.toFixed(2)]);
-    rows.push(["Grand Total", "", "", "", "", grandTotal.toFixed(2)]);
+    // --- Totals Section (matching Excel format) ---
+    rows.push([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Total",
+      taxableValue,
+      "",
+      cgstAmount,
+      sgstAmount,
+      grandTotalAmount,
+    ]);
 
-    // --- Convert to CSV string ---
+    // GST rate breakdown
+    const currentGstRate = gstPercentage || 18;
+
+    rows.push([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      `${currentGstRate}%`,
+      taxableValue,
+      "",
+      cgstAmount,
+      sgstAmount,
+      grandTotalAmount,
+    ]);
+
+    // Other rates as Nil
+    const otherRates = ["12%", "5%"].filter(
+      (rate) => rate !== `${currentGstRate}%`
+    );
+    otherRates.forEach((rate) => {
+      rows.push(["", "", "", "", "", "", rate, "Nil", "", "Nil", "Nil", "Nil"]);
+    });
+
+    // --- Convert to CSV ---
     const csvContent = rows
       .map((row) => row.map((cell) => `"${cell ?? ""}"`).join(","))
       .join("\n");
 
-    // --- Trigger Download ---
+    // --- Download ---
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `invoice_${invoiceNumber || "untitled"}.csv`;
+    link.download = `Invoice_Statement_${invoiceNumber || "untitled"}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
