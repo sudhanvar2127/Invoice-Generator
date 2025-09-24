@@ -66,8 +66,21 @@ const BillContextProvide = (props) => {
     () => new Date().toISOString().split("T")[0]
   );
   const [invoiceNumber, setInvoiceNumber] = useState(() => {
-    return localStorage.getItem("currentInvoiceNumber");
+    // Try reading saved invoice number
+    const stored = localStorage.getItem("currentInvoiceNumber");
+    if (stored) return stored;
+
+    // If not found, generate a new one
+    const fy = getFinancialYear();
+    const key = `inv-serial-${fy}`;
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, "0");
+    }
+    const newNumber = `${fy}/001`;
+    localStorage.setItem("currentInvoiceNumber", newNumber);
+    return newNumber;
   });
+
   const [ewayNumber, setEwayNumber] = useState("");
   const [modeAndTermsOfPayment, setModeAndTremsOfPayment] = useState("");
   const [deliveryNote, setDeliveryNote] = useState("");
@@ -124,23 +137,18 @@ const BillContextProvide = (props) => {
     const fy = getFinancialYear();
     const key = `inv-serial-${fy}`;
 
-    // Reset the serial number for current financial year to 0
-    localStorage.removeItem(key);
+    // Reset serial number and current invoice
     localStorage.setItem(key, "0");
+    const firstNumber = `${fy}/001`;
+    localStorage.setItem("currentInvoiceNumber", firstNumber);
 
-    // Reset current invoice number
-    localStorage.removeItem("currentInvoiceNumber");
+    setInvoiceNumber(firstNumber);
 
-    // Set invoice number context to first invoice of current FY
-    setInvoiceNumber(`${fy}/001`);
-
-    toast.success(`Invoice number reset to ${fy}/001!`);
+    toast.success(`Invoice number reset to ${firstNumber}!`);
     setShowConfirmReset(false);
 
-    // Refresh page to ensure clean state
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
+    // 🔑 Remove the reload — not required anymore
+    // window.location.reload();
   }
 
   useEffect(() => {
@@ -149,6 +157,19 @@ const BillContextProvide = (props) => {
       setBillData(savedBills[savedBills.length - 1]); // load last saved
     }
   }, []);
+
+  // Inside BillContextProvide, before value = { ... }
+  function clearAllBills() {
+    localStorage.removeItem("Bills");
+    setAllBills([]);
+    setBillData(null);
+  }
+
+  useEffect(() => {
+    if (invoiceNumber) {
+      localStorage.setItem("currentInvoiceNumber", invoiceNumber);
+    }
+  }, [invoiceNumber]);
 
   const value = {
     sellers,
@@ -224,6 +245,7 @@ const BillContextProvide = (props) => {
     getFinancialYear,
     resetInvoiceNumber,
     getNextInvoiceNumber,
+    clearAllBills,
   };
 
   return (
