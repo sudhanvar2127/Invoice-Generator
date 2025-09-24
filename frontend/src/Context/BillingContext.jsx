@@ -13,9 +13,9 @@ const BillContextProvide = (props) => {
       address:
         "# 495/15, Bharath Poultry Form, Nittuvalli Road, Near R.V.V.S. ITI College, Davangere - 577004",
       gstin: "29ABSPH4496G1Z0",
-      bankname: "Karanataka Gramina Bank",
+      bankname: "Karanataka Grameena Bank",
       accno: 123456789,
-      branchifs: "Hello, 123456789",
+      branchifs: "Karnataka Grameena Bank, Main Branch, PKGB0010590",
     },
     {
       id: "ShreeSharadaPrinters",
@@ -24,15 +24,26 @@ const BillContextProvide = (props) => {
       email: "sri.kalpvrushaprinters@gmail.com",
       address:
         "#4382/1 Suvidya 7th B main Road Swami Vivekananda Badavane, Behind Officers club, Davangere - 577004",
-      gstin: "29ABSPH4496G1Z0",
-      bankname: "Karanataka Gramina Bank",
-      accno: 123456789,
-      branchifs: "Hello, 123456789",
+      gstin: "29AJCPN3953E1Z5",
+      bankname: "Karanataka Grameena Bank",
+      accno: 10590110000550,
+      branchifs: "Karnataka Grameena Bank, Main Branch, PKGB0010590",
     },
   ];
 
   const [seller, setSeller] = useState(sellers[0]);
   const [gst, setGst] = useState(true);
+  const [nonGstSellerDetails, setNonGstSellerDetails] = useState([
+    {
+      name: "",
+      address: "",
+      phone: "",
+      email: "",
+      bankname: "",
+      accno: "",
+      branchifs: "",
+    },
+  ]);
   const [buyer, setBuyer] = useState([
     {
       name: "",
@@ -107,6 +118,29 @@ const BillContextProvide = (props) => {
     const nextNumber = `${fy}/${serial.toString().padStart(3, "0")}`;
     localStorage.setItem("currentInvoiceNumber", nextNumber);
     return nextNumber;
+  }
+
+  function resetInvoiceNumber() {
+    const fy = getFinancialYear();
+    const key = `inv-serial-${fy}`;
+
+    // Reset the serial number for current financial year to 0
+    localStorage.removeItem(key);
+    localStorage.setItem(key, "0");
+
+    // Reset current invoice number
+    localStorage.removeItem("currentInvoiceNumber");
+
+    // Set invoice number context to first invoice of current FY
+    setInvoiceNumber(`${fy}/001`);
+
+    toast.success(`Invoice number reset to ${fy}/001!`);
+    setShowConfirmReset(false);
+
+    // Refresh page to ensure clean state
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   }
 
   useEffect(() => {
@@ -184,7 +218,12 @@ const BillContextProvide = (props) => {
     billData,
     setBillData,
     allBills,
-    setAllBills
+    setAllBills,
+    nonGstSellerDetails,
+    setNonGstSellerDetails,
+    getFinancialYear,
+    resetInvoiceNumber,
+    getNextInvoiceNumber,
   };
 
   return (

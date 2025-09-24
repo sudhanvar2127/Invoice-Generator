@@ -17,8 +17,8 @@ const Navbar = () => {
           <p>ALL BILLS</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/gstcalulator" className="flex flex-col items-center gap-1">
-          <p>GST CALULATOR</p>
+        <NavLink to="/settings" className="flex flex-col items-center gap-1">
+          <p>SETTINGS</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
       </ul>
