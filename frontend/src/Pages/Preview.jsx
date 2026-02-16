@@ -45,7 +45,7 @@ const Preview = () => {
     setAllBills,
     nonGstSellerDetails,
     kindAttn,
-    setKindAttn // Added this
+    setKindAttn, // Added this
   } = useContext(BillContext);
 
   const formatDate = (dateStr) => {
@@ -71,7 +71,9 @@ const Preview = () => {
   return (
     <div className="a4">
       <h1 className="text-3xl text-center font-medium py-2">Tax Invoice</h1>
-      <p className="text-sm text-center py-0.5 font-medium">Subject to Davanagere Jurisdction</p>
+      <p className="text-sm text-center py-0.5 font-medium">
+        Subject to Davanagere Jurisdction
+      </p>
       <div className="flex border border-b-0">
         <div className="flex flex-col w-3/5">
           <section className="border-b p-2">
@@ -96,7 +98,7 @@ const Preview = () => {
                         <span>GSTIN/UIN:</span> {item.gstin}
                       </p>
                     </div>
-                  )
+                  ),
               )
             ) : (
               // Non-GST Mode - Show nonGstSellerDetails
@@ -249,7 +251,9 @@ const Preview = () => {
             {addItems.map((item, index) => (
               <tr key={index} className="text-center text-sm font-medium">
                 <td className="border-r p-2">{index + 1}</td>
-                <td className="text-start border-r p-2">{item.descriptionOfGoods}</td>
+                <td className="text-start border-r p-2">
+                  {item.descriptionOfGoods}
+                </td>
                 <td className="border-r p-2">{hsnSAC}</td>
                 <td className="border-r p-2">{item.quantity}</td>
                 <td className="border-r p-2">{item.rate}</td>
@@ -287,17 +291,13 @@ const Preview = () => {
                   <td colSpan={5} className="border-r p-2 text-end">
                     CGST ({(gstPercentage / 2).toFixed(2)}%)
                   </td>
-                  <td className="p-2 text-end">
-                    {(cGst ?? 0).toFixed(2)}
-                  </td>
+                  <td className="p-2 text-end">{(cGst ?? 0).toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td colSpan={5} className="border-r p-2 text-end">
                     SGST ({(gstPercentage / 2).toFixed(2)}%)
                   </td>
-                  <td className="p-2 text-end">
-                    {(sGst ?? 0).toFixed(2)}
-                  </td>
+                  <td className="p-2 text-end">{(sGst ?? 0).toFixed(2)}</td>
                 </tr>
               </>
             )}
@@ -311,7 +311,9 @@ const Preview = () => {
               <td colSpan={5} className="border-b border-r p-2 text-end">
                 Grand Total
               </td>
-              <td className="border-b p-2 text-end">₹ {grandTotal.toFixed(2)}</td>
+              <td className="border-b p-2 text-end">
+                ₹ {grandTotal.toFixed(2)}
+              </td>
             </tr>
             <tr>
               <td colSpan={6} className="p-2">
@@ -379,70 +381,72 @@ const Preview = () => {
         </div>
       )}
 
-      <div className="w-full flex flex-col text-xs items-end border-x">
-        {gst ? (
-          // GST Mode - Show bank details from selected seller
-          sellers.map(
-            (item, index) =>
-              seller === index && (
-                <div key={index} className="w-1/2">
+      <div className={`bill-footer-wrapper border border-t-0 ${addItems.length >= 11 ? 'force-page-break' : ''}`}>
+        <div className="w-full flex flex-col text-xs items-end border-x">
+          {gst
+            ? // GST Mode - Show bank details from selected seller
+              sellers.map(
+                (item, index) =>
+                  seller === index && (
+                    <div key={index} className="w-1/2">
+                      <p>Company's Bank Details</p>
+                      <p>
+                        Bank Name: <strong>{item.bankname}</strong>
+                      </p>
+                      <p>
+                        A/c No.: <strong>{item.accno}</strong>
+                      </p>
+                      <p>
+                        Branch & IFS Code: <strong>{item.branchifs}</strong>
+                      </p>
+                    </div>
+                  ),
+              )
+            : // Non-GST Mode - Show bank details from nonGstSellerDetails
+              safeSellerDetails.bankname && (
+                <div className="w-1/2">
                   <p>Company's Bank Details</p>
                   <p>
-                    Bank Name: <strong>{item.bankname}</strong>
+                    Bank Name: <strong>{safeSellerDetails.bankname}</strong>
                   </p>
                   <p>
-                    A/c No.: <strong>{item.accno}</strong>
+                    A/c No.: <strong>{safeSellerDetails.accno}</strong>
                   </p>
                   <p>
-                    Branch & IFS Code: <strong>{item.branchifs}</strong>
+                    Branch & IFS Code:{" "}
+                    <strong>{safeSellerDetails.branchifs}</strong>
                   </p>
                 </div>
-              )
-          )
-        ) : (
-          // Non-GST Mode - Show bank details from nonGstSellerDetails
-          safeSellerDetails.bankname && (
-            <div className="w-1/2">
-              <p>Company's Bank Details</p>
-              <p>
-                Bank Name: <strong>{safeSellerDetails.bankname}</strong>
-              </p>
-              <p>
-                A/c No.: <strong>{safeSellerDetails.accno}</strong>
-              </p>
-              <p>
-                Branch & IFS Code: <strong>{safeSellerDetails.branchifs}</strong>
-              </p>
+              )}
+        </div>
+
+        {gst && (
+          <>
+            <div className="border border-t-0 font-medium text-xs flex">
+              <section className="p-2 w-1/2 border-r">
+                <p className="underline">Declaration</p>
+                <p>
+                  We declare that this invoice shows the actual price of the
+                  goods describe and all particulars are true and correct.// OD
+                  interest @ {gstPercentage}% p.a. chargeable for payments after
+                  due date.//GOODs once sold will not be taken back.//
+                </p>
+              </section>
+              <section className="flex flex-col justify-between items-end text-xs border-t w-1/2 p-2">
+                {gst ? (
+                  sellers.map(
+                    (item, index) =>
+                      seller === index && <p key={index}>for {item.name}</p>,
+                  )
+                ) : (
+                  <p>for {safeSellerDetails.name}</p>
+                )}
+                <p>Authorised Signatory</p>
+              </section>
             </div>
-          )
+          </>
         )}
       </div>
-
-      {gst && (
-        <>
-          <div className="border border-t-0 font-medium text-xs flex">
-            <section className="p-2 w-1/2 border-r">
-              <p className="underline">Declaration</p>
-              <p>
-                We declare that this invoice shows the actual price of the goods
-                describe and all particulars are true and correct.// OD interest
-                @ {gstPercentage}% p.a. chargeable for payments after due
-                date.//GOODs once sold will not be taken back.//
-              </p>
-            </section>
-            <section className="flex flex-col justify-between items-end text-xs border-t w-1/2 p-2">
-              {gst ? (
-                sellers.map(
-                  (item, index) => seller === index && <p key={index}>for {item.name}</p>
-                )
-              ) : (
-                <p>for {safeSellerDetails.name}</p>
-              )}
-              <p>Authorised Signatory</p>
-            </section>
-          </div>
-        </>
-      )}
 
       <div className="flex justify-between items-center w-full my-2 no-print">
         <Link to="/" className="w-[15%]">

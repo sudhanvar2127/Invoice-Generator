@@ -1,54 +1,65 @@
 @import "tailwindcss";
 
-a.active hr {
-  display: block;
-}
-
 @media print {
-  *{
-    margin: 0;
-    padding: 0;
+  /* Ensure the body doesn't restrict height */
+  html, body {
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   @page {
     size: A4;
-    margin: 0;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  }
-
-  html,
-  body {
-    background: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: 8mm; /* Reduced slightly to give more vertical room for the 11th item */
   }
 
   .a4 {
-    width: 200mm;
-    min-height: 287mm;
-    padding: 5mm;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 195mm; /* Best width for MacBook Air Safari to avoid auto-scaling */
+    min-height: 280mm; /* Fills the page, but allows growth */
+    margin: 0 auto;
     background: white;
-    transform: scale(1.0);
-    transform-origin: center;
-    font-size: 12pt;
-    color: black;
+  }
+
+  /* WRAP YOUR TABLE IN THIS CLASS */
+  .bill-body {
+    flex: 1 0 auto; /* This grows and pushes the footer down */
+    width: 100%;
+  }
+
+  /* WRAP YOUR BANK DETAILS & SIGNATORY IN THIS CLASS */
+  .bill-footer {
+    flex-shrink: 0; /* Prevents the footer from squashing */
+    margin-top: 10mm; /* Your consistent padding/gap */
+    page-break-inside: avoid; /* Keeps bank details and signatory on the same page */
+    border-top: 1px solid #000;
+    padding-top: 5mm;
   }
 
   table {
-    border-collapse: collapse !important;
     width: 100%;
-    color: black !important;
+    border-collapse: collapse !important;
   }
 
-  th,
-  td {
-    padding: 0 1px;
+  /* Fix for MacBook high-res rendering of borders */
+  th, td {
+    border: 1px solid black !important;
+    padding: 4px;
+    font-size: 10pt; /* Slightly smaller to help 11 items fit on one page */
   }
 
-  .no-print,
-  .navbar,
-  header {
-    display: none !important;
+  .bill-footer-wrapper {
+    page-break-inside: avoid !important;
+    display: block !important;
+    width: 100%;
+  }
+
+  /* Ensures the signature has enough room on Mac */
+  .mt-8 {
+    margin-top: 32px;
   }
 }
