@@ -26,7 +26,7 @@ a.active hr {
 
   .a4 {
     width: 200mm;
-    min-height: 287mm;
+    max-height: 287mm;
     padding: 5mm;
     background: white;
     transform: scale(1.0);
@@ -38,7 +38,6 @@ a.active hr {
   table {
     border-collapse: collapse !important;
     width: 100%;
-    height: auto;
     color: black !important;
   }
 
