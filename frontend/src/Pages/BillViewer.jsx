@@ -24,10 +24,12 @@ const BillViewer = () => {
 
   return (
     <div className="a4">
+      <h1 className="text-3xl text-center font-medium py-2">Tax Invoice</h1>
+      <p className="text-sm text-center py-0.5 font-medium">Subject to Davanagere Jurisdction</p>
       <div className="flex border border-b-0">
         <div className="flex flex-col w-3/5">
           <section className="border-b p-2">
-            <div className="space-y-1 text-gray-700 text-sm font-medium">
+            <div className="space-y-1 text-sm font-medium">
               <p className="text-base">{bill.seller?.name || ""}</p>
               <p>{bill.seller?.address || ""}</p>
               <p>
@@ -43,7 +45,7 @@ const BillViewer = () => {
               )}
             </div>
           </section>
-          <section className="border-b p-2 text-sm font-medium text-gray-700 space-y-1">
+          <section className="border-b p-2 text-sm font-medium  space-y-1">
             <p className="text-base">{bill.buyer?.name || ""}</p>
             <p>{bill.buyer?.address || ""}</p>
             <p>
@@ -58,7 +60,7 @@ const BillViewer = () => {
               </p>
             )}
           </section>
-          <section className="p-2 text-sm font-medium text-gray-700 space-y-1">
+          <section className="p-2 text-sm font-medium space-y-1">
             <p className="text-base">{bill.consignee?.name || ""}</p>
             <p>{bill.consignee?.address || ""}</p>
             <p>
@@ -103,7 +105,7 @@ const BillViewer = () => {
               </tr>
               <tr>
                 <td className="border-r border-b w-1/2 p-2">
-                  <p>Reference No. & Date:</p>
+                  <p>Purchase No. & Date:</p>
                   {bill.referenceNumber !== "" && bill.referenceNumber ? bill.referenceNumber : <p>&nbsp;</p>}
                 </td>
                 <td className="w-1/2 border-b p-2">
@@ -147,10 +149,16 @@ const BillViewer = () => {
                   {bill.termsOfDelivery !== "" && bill.termsOfDelivery ? bill.termsOfDelivery : <p>&nbsp;</p>}
                 </td>
               </tr>
-              <tr>
+              <tr className="border-b">
                 <td className="p-2" colSpan={2}>
                   <p>e-way Bill No.:</p>
                   {bill.ewayNumber !== "" && bill.ewayNumber ? bill.ewayNumber : <p>&nbsp;</p>}
+                </td>
+              </tr>
+              <tr>
+                <td className="p-2" colSpan={2}>
+                  <p>Kind Attn :</p>
+                  {bill.kindAttn !== "" && bill.kindAttn ? bill.kindAttn : <p>&nbsp;</p>}
                 </td>
               </tr>
             </tbody>
@@ -174,7 +182,7 @@ const BillViewer = () => {
             {bill.items?.map((item, index) => (
               <tr key={index} className="text-center text-sm font-medium">
                 <td className="border-r p-2">{index + 1}</td>
-                <td className="border-r p-2">{item.descriptionOfGoods || ""}</td>
+                <td className="text-start border-r p-2">{item.descriptionOfGoods || ""}</td>
                 <td className="border-r p-2">{bill.hsnSAC || ""}</td>
                 <td className="border-r p-2">{item.quantity || ""}</td>
                 <td className="border-r p-2">{item.rate || ""}</td>
@@ -182,7 +190,7 @@ const BillViewer = () => {
               </tr>
             ))}
 
-            {[...Array(Math.max(19 - (bill.items?.length || 0), 0))].map((_, i) => (
+            {[...Array(Math.max(10 - (bill.items?.length || 0), 0))].map((_, i) => (
               <tr
                 key={`empty-${i}`}
                 className="text-center text-sm font-medium"

@@ -42,6 +42,7 @@ const GenerateBill = () => {
     allBills,
     setAllBills,
     setInvoiceNumber,
+    kindAttn
   } = useContext(BillContext);
 
   const formatDate = (dateStr) => {
@@ -87,6 +88,7 @@ const GenerateBill = () => {
       "CGST Amt.",
       "SGST Amt.",
       "Total Amount",
+      "Kind Attn"
     ]);
 
     const itemsDescription = addItems
@@ -107,6 +109,7 @@ const GenerateBill = () => {
       cGst || 0,
       sGst || 0,
       grandTotal || 0,
+      kindAttn || ""
     ]);
 
     // Empty rows for format
@@ -182,11 +185,6 @@ const GenerateBill = () => {
 
     if (gst && !gstPercentage) {
       toast.error("Please enter the GST Percentage");
-      return;
-    }
-
-    if (gst && !ewayNumber) {
-      toast.error("Please enter the E-way bill number");
       return;
     }
 

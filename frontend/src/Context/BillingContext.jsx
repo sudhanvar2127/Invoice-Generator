@@ -6,8 +6,8 @@ export const BillContext = createContext();
 const BillContextProvide = (props) => {
   const sellers = [
     {
-      id: "SriKalpvrushaPrinters",
-      name: "Sri Kalpvrusha Printers",
+      id: "ShreeKalpvrushaPrinters",
+      name: "Shree Kalpvrusha Printers",
       phone: 9972799992,
       email: "sri.kalpvrushaprinters@gmail.com",
       address:
@@ -15,11 +15,11 @@ const BillContextProvide = (props) => {
       gstin: "29ABSPH4496G1Z0",
       bankname: "Karanataka Grameena Bank",
       accno: 10590130002112,
-      branchifs: "Karnataka Grameena Bank, Main Branch, PKGB0010590",
+      branchifs: "P J Branch, PKGB0010590",
     },
     {
-      id: "ShreeSharadaPrinters",
-      name: "Shree Sharada Printers",
+      id: "SriSharadaPrinters",
+      name: "Sri Sharada Printers",
       phone: 9986788647,
       email: "sri.kalpvrushaprinters@gmail.com",
       address:
@@ -27,7 +27,7 @@ const BillContextProvide = (props) => {
       gstin: "29AJCPN3953E1Z5",
       bankname: "Karanataka Grameena Bank",
       accno: 10590110000550,
-      branchifs: "Karnataka Grameena Bank, Main Branch, PKGB0010590",
+      branchifs: "P J Branch, PKGB0010590",
     },
   ];
 
@@ -78,6 +78,8 @@ const BillContextProvide = (props) => {
     localStorage.setItem("currentInvoiceNumber", newNumber);
     return newNumber;
   });
+
+  const [kindAttn, setKindAttn] = useState("")
 
   const [ewayNumber, setEwayNumber] = useState("");
   const [modeAndTermsOfPayment, setModeAndTremsOfPayment] = useState("");
@@ -241,8 +243,9 @@ const BillContextProvide = (props) => {
     setNonGstSellerDetails,
     getFinancialYear,
     resetInvoiceNumber,
-    getNextInvoiceNumber,
     clearAllBills,
+    kindAttn,
+    setKindAttn
   };
 
   return (

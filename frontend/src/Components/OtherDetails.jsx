@@ -35,7 +35,9 @@ const OtherDetails = () => {
     setTermsOfDelivery,
     hsnSAC,
     setHSNSAC,
-    getNextInvoiceNumber
+    getNextInvoiceNumber,
+    kindAttn,
+    setKindAttn
   } = useContext(BillContext);
 
   useEffect(() => {
@@ -80,7 +82,7 @@ const OtherDetails = () => {
           />
           <hr className="mt-1" />
           <label className="text-sm font-medium text-gray-900">
-            Reference No. & Date:
+            Purchase No. & Date:
           </label>
           <input
             type="text"
@@ -94,7 +96,7 @@ const OtherDetails = () => {
             Buyer's Order No.:
           </label>
           <input
-            type="number"
+            type="text"
             name="buyersOrderNumber"
             value={buyersOrderNumber}
             onChange={(e) => setBuyersOrderNumber(e.target.value)}
@@ -219,6 +221,16 @@ const OtherDetails = () => {
           name="hsnSAC"
           value={hsnSAC}
           onChange={(e) => setHSNSAC(e.target.value)}
+          className="border rounded p-1.5"
+        />
+        <label className="text-sm font-medium text-gray-900">
+          Kind Attn:
+        </label>
+        <input
+          type="text"
+          name="kindAttn"
+          value={kindAttn}
+          onChange={(e) => setKindAttn(e.target.value)}
           className="border rounded p-1.5"
         />
       </div>

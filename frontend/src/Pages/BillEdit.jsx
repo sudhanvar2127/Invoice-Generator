@@ -114,6 +114,8 @@ const BillEdit = () => {
 
   return (
     <div className="a4">
+      <h1 className="text-3xl text-center font-medium py-2">Tax Invoice</h1>
+      <p className="text-sm text-center py-0.5 font-medium">Subject to Davanagere Jurisdction</p>
       <form onSubmit={handleSubmit}>
         {/* Header with Update Button */}
         <div className="flex justify-between items-center mb-4 no-print">
@@ -137,21 +139,8 @@ const BillEdit = () => {
 
         <div className="flex border border-b-0">
           <div className="flex flex-col w-3/5">
-            {/* Seller Section (Read-only) */}
-            <section className="border-b p-2">
-              <div className="space-y-1 text-gray-700 text-sm font-medium">
-                <p className="text-base">{formData.seller?.name}</p>
-                <p>{formData.seller?.address}</p>
-                <p><span>Phone:</span> {formData.seller?.phone}</p>
-                <p><span>Email:</span> {formData.seller?.email}</p>
-                {formData.gst && formData.seller?.gstin && (
-                  <p><span>GSTIN/UIN:</span> {formData.seller.gstin}</p>
-                )}
-              </div>
-            </section>
-
             {/* Buyer Section (Editable) */}
-            <section className="border-b p-2 text-sm font-medium text-gray-700 space-y-1">
+            <section className="border-b p-2 text-sm font-medium space-y-1">
               <input
                 type="text"
                 value={formData.buyer?.name || ""}
@@ -299,7 +288,7 @@ const BillEdit = () => {
                 </tr>
                 <tr>
                   <td className="border-r border-b w-1/2 p-2">
-                    <p>Reference No. & Date:</p>
+                    <p>Purchase No. & Date:</p>
                     <input
                       type="text"
                       value={formData.referenceNumber || ""}
@@ -388,12 +377,23 @@ const BillEdit = () => {
                     />
                   </td>
                 </tr>
-                <tr>
+                <tr className="border-b">
                   <td className="p-2" colSpan={2}>
                     <p>e-way Bill No.:</p>
                     <input
                       type="text"
                       value={formData.ewayNumber || ""}
+                      onChange={(e) => handleInputChange("ewayNumber", e.target.value)}
+                      className="border border-gray-300 rounded px-2 py-1 w-full"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="p-2" colSpan={2}>
+                    <p>Kind Attn:</p>
+                    <input
+                      type="text"
+                      value={formData.kindAttn || ""}
                       onChange={(e) => handleInputChange("ewayNumber", e.target.value)}
                       className="border border-gray-300 rounded px-2 py-1 w-full"
                     />
@@ -422,7 +422,7 @@ const BillEdit = () => {
               {formData.items?.map((item, index) => (
                 <tr key={index} className="text-center text-sm font-medium">
                   <td className="border-r p-2">{index + 1}</td>
-                  <td className="border-r p-2">
+                  <td className="text-start border-r p-2">
                     <input
                       type="text"
                       value={item.descriptionOfGoods || ""}
@@ -470,7 +470,7 @@ const BillEdit = () => {
                 </tr>
               ))}
 
-              {[...Array(Math.max(16 - (formData.items?.length || 0), 0))].map((_, i) => (
+              {[...Array(Math.max(10 - (formData.items?.length || 0), 0))].map((_, i) => (
                 <tr key={`empty-${i}`} className="text-center text-sm font-medium">
                   <td className="border-r p-2">&nbsp;</td>
                   <td className="border-r p-2">&nbsp;</td>

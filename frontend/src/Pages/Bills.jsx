@@ -310,7 +310,7 @@ const Bills = () => {
                 </div>
 
                 {bill.items && bill.items.length > 0 && (
-                  <div className="text-xs mt-2 text-gray-600">
+                  <div className="text-xs mt-2">
                     <span className="font-medium">Items:</span>{" "}
                     {bill.items.map((item) => item.descriptionOfGoods).join(", ")}
                   </div>
