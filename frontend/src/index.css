@@ -38,6 +38,7 @@ a.active hr {
   table {
     border-collapse: collapse !important;
     width: 100%;
+    height: auto;
     color: black !important;
   }
 
