@@ -66,7 +66,7 @@ const Seller = () => {
       ) : (
         <>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
               Seller Name
             </label>
             <input
@@ -81,7 +81,7 @@ const Seller = () => {
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="address" className="block text-sm font-medium mb-1">
               Address
             </label>
             <textarea
@@ -96,7 +96,7 @@ const Seller = () => {
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-sm font-medium mb-1">
               Phone
             </label>
             <input
@@ -111,7 +111,7 @@ const Seller = () => {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email
             </label>
             <input

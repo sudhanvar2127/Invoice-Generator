@@ -13,7 +13,7 @@ a.active hr {
   @page {
     size: A4;
     margin: 0;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Times New Roman', Times, serif !important;
   }
 
   html,
@@ -23,6 +23,21 @@ a.active hr {
     justify-content: center;
     align-items: center;
   }
+  
+  .seller{
+    font-size: 8pt !important;
+  }
+
+  .print-section {
+    page-break-after: always;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Remove last page break to prevent a blank 3rd page */
+  .print-section:last-child {
+    page-break-after: auto;
+  }
 
   .a4 {
     width: 200mm;
@@ -31,9 +46,10 @@ a.active hr {
     background: white;
     transform: scale(1.0);
     transform-origin: center;
-    font-size: 12pt;
+    font-size: 10pt !important;
     color: black;
   }
+
 
   table {
     border-collapse: collapse !important;

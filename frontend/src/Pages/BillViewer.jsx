@@ -26,10 +26,10 @@ const BillViewer = () => {
     <div className="a4">
       <h1 className="text-3xl text-center font-medium py-2">Tax Invoice</h1>
       <p className="text-sm text-center py-0.5 font-medium">Subject to Davanagere Jurisdction</p>
-      <div className="flex border border-b-0">
+      <div className="flex border border-b-0 seller">
         <div className="flex flex-col w-3/5">
           <section className="border-b p-2">
-            <div className="space-y-1 text-sm font-medium">
+            <div className="space-y-1 font-medium">
               <p className="text-base">{bill.seller?.name || ""}</p>
               <p>{bill.seller?.address || ""}</p>
               <p>
@@ -45,7 +45,7 @@ const BillViewer = () => {
               )}
             </div>
           </section>
-          <section className="border-b p-2 text-sm font-medium  space-y-1">
+          <section className="border-b p-2 font-medium  space-y-1">
             <p className="text-base">{bill.buyer?.name || ""}</p>
             <p>{bill.buyer?.address || ""}</p>
             <p>
@@ -60,7 +60,7 @@ const BillViewer = () => {
               </p>
             )}
           </section>
-          <section className="p-2 text-sm font-medium space-y-1">
+          <section className="p-2 font-medium space-y-1">
             <p className="text-base">{bill.consignee?.name || ""}</p>
             <p>{bill.consignee?.address || ""}</p>
             <p>
@@ -76,7 +76,7 @@ const BillViewer = () => {
             )}
           </section>
         </div>
-        <div className="w-2/5 font-medium text-sm border-l">
+        <div className="w-2/5 font-medium border-l">
           <table className="w-full">
             <tbody className="">
               <tr>
@@ -312,7 +312,7 @@ const BillViewer = () => {
         </div>
       )}
 
-      <div className="w-full flex flex-col text-xs items-end border-x">
+      <div className="w-full flex flex-col items-end border-x seller">
         <div className="w-1/2">
           <p>Company's Bank Details</p>
           <p>
@@ -329,7 +329,7 @@ const BillViewer = () => {
 
       {bill.gst && (
         <>
-          <div className="border border-t-0 font-medium text-xs flex">
+          <div className="border border-t-0 font-medium flex seller">
             <section className="p-2 w-1/2 border-r">
               <p className="underline">Declaration</p>
               <p>
@@ -339,7 +339,7 @@ const BillViewer = () => {
                 date.//GOODs once sold will not be taken back.//
               </p>
             </section>
-            <section className="flex flex-col justify-between items-end text-xs border-t w-1/2 p-2">
+            <section className="flex flex-col justify-between items-end border-t w-1/2 p-2">
               <p>for {bill.seller?.name || ""}</p>
               <p>Authorised Signatory</p>
             </section>
