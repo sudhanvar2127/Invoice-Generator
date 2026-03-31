@@ -7,7 +7,7 @@ const BillContextProvide = (props) => {
   const sellers = [
     {
       id: "ShreeKalpavrushaPrinters",
-      name: "Shree Kalpvrusha Printers",
+      name: "Shree Kalpavrusha Printers",
       phone: 9972799992,
       email: "sri.kalpavrushaprinters@gmail.com",
       address:
