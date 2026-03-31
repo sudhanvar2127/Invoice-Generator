@@ -6,10 +6,10 @@ export const BillContext = createContext();
 const BillContextProvide = (props) => {
   const sellers = [
     {
-      id: "ShreeKalpvrushaPrinters",
+      id: "ShreeKalpavrushaPrinters",
       name: "Shree Kalpvrusha Printers",
       phone: 9972799992,
-      email: "sri.kalpvrushaprinters@gmail.com",
+      email: "sri.kalpavrushaprinters@gmail.com",
       address:
         "# 495/15, Bharath Poultry Form, Nittuvalli Road, Near R.V.V.S. ITI College, Davangere - 577004",
       gstin: "29ABSPH4496G1Z0",
@@ -20,8 +20,8 @@ const BillContextProvide = (props) => {
     {
       id: "SriSharadaPrinters",
       name: "Sri Sharada Printers",
-      phone: 9986788647,
-      email: "sri.kalpvrushaprinters@gmail.com",
+      phone: 7899274646,
+      email: "sri.sharadaprinters@gmail.com",
       address:
         "#4382/1 Suvidya 7th B main Road Swami Vivekananda Badavane, Behind Officers club, Davangere - 577004",
       gstin: "29AJCPN3953E1Z5",
